@@ -32,4 +32,6 @@ public:
     std::uint8_t get_memory(std::uint16_t address);
     std::uint16_t get_pc();
     std::uint8_t get_register(std::uint8_t index);
+    const std::array<std::uint8_t, 64*32>& get_display() const;
+    void test_display();
 };

@@ -273,6 +273,7 @@ void Chip8::execute_opcode(std::uint16_t opcode)
 
 void Chip8::cycle() {
     std::uint16_t opcode{fetch_opcode()};
+    std::cout << "Opcode: 0x" << std::hex << opcode << '\n';
     execute_opcode(opcode);
 }
 
@@ -302,4 +303,20 @@ std::uint16_t Chip8::get_pc() {
 
 std::uint8_t Chip8::get_register(std::uint8_t index) {
     return V[index];
+}
+
+const std::array<std::uint8_t, 64*32>& Chip8::get_display() const {
+    return display;
+}
+
+void Chip8::test_display() {
+    display[0] = 1;
+    display[1] = 1;
+    display[2] = 1;
+    display[64] = 1;
+    display[65] = 1;
+    display[66] = 1;
+    display[128] = 1;
+    display[129] = 1;
+    display[130] = 1;
 }
