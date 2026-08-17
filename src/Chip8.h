@@ -31,4 +31,5 @@ public:
     void load_rom(const std::string& filename);
     std::uint8_t get_memory(std::uint16_t address);
     std::uint16_t get_pc();
+    std::uint8_t get_register(std::uint8_t index);
 };

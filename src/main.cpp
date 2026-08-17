@@ -32,5 +32,7 @@ int main()
     std::cout << "PC after cycle 2: 0x"
               << chip8.get_pc() << '\n';
 
+    std::cout << "V1: " << static_cast<int>(chip8.get_register(1)) << "\n";
+
     return 0;
 }

@@ -168,7 +168,7 @@ void Chip8::execute_opcode(std::uint16_t opcode)
                 for (std::uint8_t column{0}; column < 8; column++) {
 
                     //Check whether the current sprite bit is non-zero so we can draw
-                    bool check{spriterow & (0x80 >> column) }; // 0x80 is 10000000 - moved it to the right according to the element in the row
+                    bool check = (spriterow & (0x80 >> column)) != 0; // 0x80 is 10000000 - moved it to the right according to the element in the row
                     //example:
                     //sprite = 1111 1111
                     //0x80 = 1000 0000, changed to 0100 0000 because we were in row 1
@@ -181,7 +181,7 @@ void Chip8::execute_opcode(std::uint16_t opcode)
                         // Convert 2D (x, y) coordinates into a 1D display index.
                         // Each display row contains 64 pixels.
 
-                        std::size_t index{64 * ypos + xpos};
+                        std::size_t index = 64 * ypos + xpos;
 
                         if (display[index] == 1) { //is there already a pixel on the screen here?
                             V[0xF] = 1; //notify VF, to track collisions
@@ -298,4 +298,8 @@ std::uint8_t Chip8::get_memory(std::uint16_t address) {
 
 std::uint16_t Chip8::get_pc() {
     return pc;
+}
+
+std::uint8_t Chip8::get_register(std::uint8_t index) {
+    return V[index];
 }
