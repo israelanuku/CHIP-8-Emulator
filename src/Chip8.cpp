@@ -310,6 +310,8 @@ const std::array<std::uint8_t, 64*32>& Chip8::get_display() const {
 }
 
 void Chip8::test_display() {
+    // 3x3 test display
+
     display[0] = 1;
     display[1] = 1;
     display[2] = 1;
@@ -319,4 +321,17 @@ void Chip8::test_display() {
     display[128] = 1;
     display[129] = 1;
     display[130] = 1;
+}
+
+void Chip8::set_key(std::uint8_t key, bool pressed) {
+    keypad[key] = pressed;
+
+    if (waiting_for_key && pressed) {
+        waiting_for_key = false;
+        V[key_register] = key;
+    }
+}
+
+bool Chip8::is_waiting_for_key() const {
+    return waiting_for_key;
 }
