@@ -36,4 +36,6 @@ public:
     void test_display();
     void set_key(std::uint8_t key, bool pressed);
     bool is_waiting_for_key() const;
+    void tick_timers();
+    std::uint8_t get_delay_timer() const;
 };

@@ -39,7 +39,7 @@ int get_chip8_key(SDL_Keycode key)
 int main()
 {
     Chip8 chip8;
-    chip8.load_rom("roms/keytest.ch8");
+    chip8.load_rom("roms/timer_test.ch8");
 
     if (SDL_Init(SDL_INIT_VIDEO) != 0) {
         std::cerr << "SDL_Init failed: "
@@ -82,6 +82,7 @@ int main()
     std::cout << "SDL window and renderer created successfully!\n";
 
     bool running{true};
+    std::uint32_t last_tick = SDL_GetTicks();
 
     while(running) {
         SDL_Event event;
@@ -100,10 +101,24 @@ int main()
             }
         }
         
+        std::uint32_t current_time = SDL_GetTicks();
+        std::uint32_t time_diff = current_time - last_tick;
+
+        if (time_diff >= (1000/60)) {
+            last_tick = current_time;
+
+            chip8.tick_timers();
+
+            std::cout << "Delay timer: "
+              << static_cast<int>(chip8.get_delay_timer())
+              << '\n';
+        }
 
         if (!chip8.is_waiting_for_key()) {
             chip8.cycle();
         }
+        
+        // RENDER
 
          //clear screen
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);

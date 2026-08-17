@@ -273,7 +273,6 @@ void Chip8::execute_opcode(std::uint16_t opcode)
 
 void Chip8::cycle() {
     std::uint16_t opcode{fetch_opcode()};
-    std::cout << "Opcode: 0x" << std::hex << opcode << '\n';
     execute_opcode(opcode);
 }
 
@@ -328,10 +327,30 @@ void Chip8::set_key(std::uint8_t key, bool pressed) {
 
     if (waiting_for_key && pressed) {
         waiting_for_key = false;
-        V[key_register] = key;
+        V[key_register] = key; // set the register corresponding to the 2nd digit in the opcode to key pressed
     }
 }
 
 bool Chip8::is_waiting_for_key() const {
     return waiting_for_key;
+}
+
+void Chip8::tick_timers() {
+    if (sound_timer > 0) {
+        --sound_timer;
+    }
+
+    std::cout << "BEFORE: " << static_cast<int>(delay_timer) << '\n';
+
+    if (delay_timer > 0) {
+        --delay_timer;
+    }
+
+    std::cout << "AFTER: " << static_cast<int>(delay_timer) << '\n';
+
+}
+
+std::uint8_t Chip8::get_delay_timer() const
+{
+    return delay_timer;
 }
