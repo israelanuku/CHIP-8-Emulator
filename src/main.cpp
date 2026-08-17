@@ -7,7 +7,9 @@ int main()
 {
     Chip8 chip8;
     chip8.load_rom("roms/test.ch8");
-    chip8.test_display();
+    for (int i = 0; i < 10; i++) {
+        chip8.cycle();
+    }
 
     if (SDL_Init(SDL_INIT_VIDEO) != 0) {
         std::cerr << "SDL_Init failed: "
