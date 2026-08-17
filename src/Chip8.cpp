@@ -1,9 +1,8 @@
 #include "Chip8.h"
 #include <algorithm> // for std::fill
 #include <cstdint>
-#include <array>
+#include <fstream>
 #include <iostream>
-#include <random>
 
 std::uint16_t Chip8::fetch_opcode()
 {
@@ -169,7 +168,7 @@ void Chip8::execute_opcode(std::uint16_t opcode)
                 for (std::uint8_t column{0}; column < 8; column++) {
 
                     //Check whether the current sprite bit is non-zero so we can draw
-                    std::uint8_t check{spriterow & (0x80 >> column) }; // 0x80 is 10000000 - moved it to the right according to the element in the row
+                    bool check{spriterow & (0x80 >> column) }; // 0x80 is 10000000 - moved it to the right according to the element in the row
                     //example:
                     //sprite = 1111 1111
                     //0x80 = 1000 0000, changed to 0100 0000 because we were in row 1
@@ -182,7 +181,7 @@ void Chip8::execute_opcode(std::uint16_t opcode)
                         // Convert 2D (x, y) coordinates into a 1D display index.
                         // Each display row contains 64 pixels.
 
-                        std::uint16_t index{64 * ypos + xpos};
+                        std::size_t index{64 * ypos + xpos};
 
                         if (display[index] == 1) { //is there already a pixel on the screen here?
                             V[0xF] = 1; //notify VF, to track collisions
@@ -206,15 +205,97 @@ void Chip8::execute_opcode(std::uint16_t opcode)
             break;
 
         case 0xE:
-            // EX9E / EXA1
+            // EX9E / EXA1 : Skip the next instruction depending on key pressed
+            if (value == 0x9E) {
+                if(keypad[V[x]]) { //if key is pressed
+                    pc += 2;
+                }
+            }
+            else if (value == 0xA1) {
+                if(!keypad[V[x]]) { //if key isnt pressed
+                    pc += 2;
+                }
+            }
+
             break;
 
         case 0xF:
-            // FX07, FX0A, FX15, etc.
-            break;
+            // FX07, FX0A, FX15, etc. note they all start with F3
+            switch(value) {
+                case 0x07:
+                    V[x] = delay_timer;
+                    break;
+
+                case 0x15:
+                    delay_timer = V[x];
+                    break;
+                
+                case 0x18:
+                    sound_timer = V[x];
+                    break;
+                
+                case 0x1E:
+                    I += V[x];
+                    break;
+
+                case 0x33:
+                    memory[I] = V[x] / 100;
+                    memory[I + 1] = (V[x] /10) % 10;
+                    memory[I + 2] = V[x] % 10;
+                    break;
+                
+                case 0x55:
+                    for(int i{0}; i <= x; i++) {
+                        memory[I + i] = V[i];
+                    }
+                    break;
+                
+                case 0x65:
+                    for(int i{0}; i <= x; i++) {
+                        V[i] = memory[I + i];
+                    }
+                    break;
+
+                case 0x0A:
+                    waiting_for_key = true;
+                    key_register = x; 
+                    break;
+
+            }
+
+        break;
 
         default:
             // Invalid opcode
             break;
     }
+}
+
+void Chip8::cycle() {
+    std::uint16_t opcode{fetch_opcode()};
+    execute_opcode(opcode);
+}
+
+void Chip8::load_rom(const std::string& filename) {
+    std::ifstream file(filename, std::ios::binary); //for raw binary numbers, since it won't be a text file
+
+    if (!file) {
+        std::cerr << "Failed to open ROM\n";
+        return;
+    }
+
+    file.read(
+        reinterpret_cast<char*>(&memory[0x200]), //file.read requires char*, so change it from an 8 bit int
+        memory.size() - 0x200
+    ); //where to put data, how many bytes to read
+
+
+}
+
+std::uint8_t Chip8::get_memory(std::uint16_t address) {
+    return memory[address];
+}
+
+std::uint16_t Chip8::get_pc() {
+    return pc;
 }

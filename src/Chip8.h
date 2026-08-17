@@ -2,6 +2,7 @@
 
 #include <array>
 #include <cstdint>
+#include <string>
 
 class Chip8 {
 private:
@@ -18,8 +19,16 @@ private:
     std::uint8_t sound_timer{0};
 
     std::array<std::uint8_t, 64 * 32> display{};
+    std::array<bool, 16> keypad{};
+
+    bool waiting_for_key{false};
+    std::uint8_t key_register{0};
 
 public:
     std::uint16_t fetch_opcode();
     void execute_opcode(std::uint16_t opcode);
+    void cycle();
+    void load_rom(const std::string& filename);
+    std::uint8_t get_memory(std::uint16_t address);
+    std::uint16_t get_pc();
 };
