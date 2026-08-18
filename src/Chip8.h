@@ -38,4 +38,5 @@ public:
     bool is_waiting_for_key() const;
     void tick_timers();
     std::uint8_t get_delay_timer() const;
+    std::uint8_t get_sound_timer() const;
 };

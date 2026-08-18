@@ -340,17 +340,18 @@ void Chip8::tick_timers() {
         --sound_timer;
     }
 
-    std::cout << "BEFORE: " << static_cast<int>(delay_timer) << '\n';
-
     if (delay_timer > 0) {
         --delay_timer;
     }
-
-    std::cout << "AFTER: " << static_cast<int>(delay_timer) << '\n';
 
 }
 
 std::uint8_t Chip8::get_delay_timer() const
 {
     return delay_timer;
+}
+
+std::uint8_t Chip8::get_sound_timer() const
+{
+    return sound_timer;
 }

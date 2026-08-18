@@ -36,14 +36,33 @@ int get_chip8_key(SDL_Keycode key)
     }
 }
 
+// Square-wave audio generation based on concepts from SDL2 Audio API documentation:
+// https://wiki.libsdl.org/SDL2/CategoryAudio
+void generate_beep(float* buffer, int samples, int sample_rate)
+{
+    const float frequency = 440.0f; // pitch
+    const float amplitude = 0.2f; // volume
+
+    static float phase = 0.0f;
+
+    for (int i = 0; i < samples; ++i) {
+        buffer[i] = (phase < 0.5f) ? amplitude : -amplitude;
+
+        phase += frequency / sample_rate;
+
+        if (phase >= 1.0f) {
+            phase -= 1.0f;
+        }
+    }
+}
+
 int main()
 {
     Chip8 chip8;
-    chip8.load_rom("roms/timer_test.ch8");
+    chip8.load_rom("roms/sound_test.ch8");
 
-    if (SDL_Init(SDL_INIT_VIDEO) != 0) {
-        std::cerr << "SDL_Init failed: "
-                  << SDL_GetError() << '\n';
+    if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO) != 0) { // make sure to initialize video graphics and sound
+        std::cerr << "SDL_Init failed: " << SDL_GetError() << '\n';
         return 1;
     }
 
@@ -81,6 +100,33 @@ int main()
 
     std::cout << "SDL window and renderer created successfully!\n";
 
+    SDL_AudioSpec audio_spec{};
+
+    audio_spec.freq = 44100; // 44,100 audio samples per second
+    audio_spec.format = AUDIO_F32SYS; // each sample is a 32-bit floating-point value
+    audio_spec.channels = 1;
+    audio_spec.samples = 512;
+    audio_spec.callback = nullptr;
+
+    SDL_AudioDeviceID audio_device = SDL_OpenAudioDevice(
+        nullptr,
+        0,
+        &audio_spec,
+        nullptr,
+        0
+    );
+
+    if (audio_device == 0) {
+        std::cerr << "SDL_OpenAudioDevice failed: " << SDL_GetError() << '\n';
+
+        SDL_DestroyRenderer(renderer);
+        SDL_DestroyWindow(window);
+        SDL_Quit();
+        return 1;
+    }
+
+    SDL_PauseAudioDevice(audio_device, 0);
+
     bool running{true};
     std::uint32_t last_tick = SDL_GetTicks();
 
@@ -109,13 +155,23 @@ int main()
 
             chip8.tick_timers();
 
-            std::cout << "Delay timer: "
-              << static_cast<int>(chip8.get_delay_timer())
-              << '\n';
         }
 
         if (!chip8.is_waiting_for_key()) {
             chip8.cycle();
+        }
+
+        if (chip8.get_sound_timer() > 0 &&  SDL_GetQueuedAudioSize(audio_device) < 2048) { // Only give SDL another chunk if there isn't already enough audio waiting
+
+            float audio_buffer[512];
+
+            generate_beep(audio_buffer, 512, 44100);
+
+            SDL_QueueAudio(
+                audio_device,
+                audio_buffer,
+                sizeof(audio_buffer)
+            );
         }
         
         // RENDER
@@ -149,6 +205,7 @@ int main()
         SDL_RenderPresent(renderer);
     }
 
+    SDL_CloseAudioDevice(audio_device);
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
     SDL_Quit();
