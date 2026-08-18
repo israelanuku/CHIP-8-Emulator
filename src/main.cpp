@@ -128,7 +128,13 @@ int main()
     SDL_PauseAudioDevice(audio_device, 0);
 
     bool running{true};
-    std::uint32_t last_tick = SDL_GetTicks();
+    std::uint32_t last_timer_tick = SDL_GetTicks();
+    std::uint32_t last_cpu_tick = SDL_GetTicks();
+    std::uint32_t last_render_tick = SDL_GetTicks();
+
+    const std::uint32_t timer_interval = 1000 / 60;
+    const std::uint32_t cpu_interval = 1000 / 500;
+    const std::uint32_t render_interval = 1000 / 60;
 
     while(running) {
         SDL_Event event;
@@ -148,16 +154,16 @@ int main()
         }
         
         std::uint32_t current_time = SDL_GetTicks();
-        std::uint32_t time_diff = current_time - last_tick;
 
-        if (time_diff >= (1000/60)) {
-            last_tick = current_time;
-
+        if (current_time - last_timer_tick >= timer_interval) {
+            last_timer_tick = current_time;
             chip8.tick_timers();
-
         }
 
-        if (!chip8.is_waiting_for_key()) {
+        if (!chip8.is_waiting_for_key() &&
+            current_time - last_cpu_tick >= cpu_interval) {
+
+            last_cpu_tick = current_time;
             chip8.cycle();
         }
 
@@ -173,36 +179,42 @@ int main()
                 sizeof(audio_buffer)
             );
         }
+
+        if (current_time - last_render_tick >= render_interval) {
+            last_render_tick = current_time;
         
-        // RENDER
+            // RENDER
 
-         //clear screen
-        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-        SDL_RenderClear(renderer);
-        
-        const auto& display = chip8.get_display();
-        SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+            //clear screen
+            SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+            SDL_RenderClear(renderer);
+            
+            const auto& display = chip8.get_display();
+            SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
 
-        for (int y{0}; y < 32; y++) {
-            for (int x{0}; x <64; x++) {
-                    std::size_t index = 64 * y + x;
+            for (int y{0}; y < 32; y++) {
+                for (int x{0}; x <64; x++) {
+                        std::size_t index = 64 * y + x;
 
-                    if (display[index]) { // if this pixel is ON
-                        SDL_Rect pixel{
-                            x * 10, // scale the 64 to 640
-                            y * 10,
-                            10,
-                            10
-                        };
-                        
-                        SDL_RenderFillRect(renderer, &pixel);
-                    }
+                        if (display[index]) { // if this pixel is ON
+                            SDL_Rect pixel{
+                                x * 10, // scale the 64 to 640
+                                y * 10,
+                                10,
+                                10
+                            };
+                            
+                            SDL_RenderFillRect(renderer, &pixel);
+                        }
 
-
+                }
             }
+
+            SDL_RenderPresent(renderer);
         }
 
-        SDL_RenderPresent(renderer);
+
+        
     }
 
     SDL_CloseAudioDevice(audio_device);
