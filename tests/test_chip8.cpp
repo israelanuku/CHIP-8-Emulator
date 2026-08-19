@@ -1,4 +1,4 @@
-#include "Chip8.h"
+#include "../src/Chip8.h"
 #include <iostream>
 #include <cstdlib>
 
@@ -81,12 +81,80 @@ void test_addition_without_carry()
     std::cout << "PASS: test_addition_without_carry\n";
 }
 
+void test_register_copy()
+{
+    Chip8 chip8;
+
+    chip8.execute_opcode(0x600A); // V0 = 10
+    chip8.execute_opcode(0x6114); // V1 = 20
+    chip8.execute_opcode(0x8010); // V0 = V1
+
+    if (chip8.get_register(0) != 20) {
+        std::cerr << "FAIL: test_register_copy\n";
+        std::exit(1);
+    }
+
+    std::cout << "PASS: test_register_copy\n";
+}
+
+void test_bitwise_or()
+{
+    Chip8 chip8;
+
+    chip8.execute_opcode(0x600F); // V0 = 00001111
+    chip8.execute_opcode(0x61F0); // V1 = 11110000
+    chip8.execute_opcode(0x8011); // V0 |= V1
+
+    if (chip8.get_register(0) != 0xFF) { // should be 1111 1111
+        std::cerr << "FAIL: test_bitwise_or\n";
+        std::exit(1);
+    }
+
+    std::cout << "PASS: test_bitwise_or\n";
+}
+
+void test_bitwise_and()
+{
+    Chip8 chip8;
+
+    chip8.execute_opcode(0x60F0); // 11110000
+    chip8.execute_opcode(0x615F); // 01011111
+    chip8.execute_opcode(0x8012); // V0 &= V1
+
+    if (chip8.get_register(0) != 0x50) { // 0101 0000
+        std::cerr << "FAIL: test_bitwise_and\n";
+        std::exit(1);
+    }
+
+    std::cout << "PASS: test_bitwise_and\n";
+}
+
+void test_bitwise_xor()
+{
+    Chip8 chip8;
+
+    chip8.execute_opcode(0x60FF); // 11111111
+    chip8.execute_opcode(0x610F); // 00001111
+    chip8.execute_opcode(0x8013); // V0 ^= V1
+
+    if (chip8.get_register(0) != 0xF0) {
+        std::cerr << "FAIL: test_bitwise_xor\n";
+        std::exit(1);
+    }
+
+    std::cout << "PASS: test_bitwise_xor\n";
+}
+
 int main()
 {
     test_register_assignment();
     test_register_addition();
     test_addition_with_carry();
     test_addition_without_carry();
+    test_register_copy();
+    test_bitwise_or();
+    test_bitwise_and();
+    test_bitwise_xor();
 
     std::cout << "All tests passed!\n";
 
