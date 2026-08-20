@@ -4,6 +4,8 @@ A CHIP-8 emulator written in **C++17** with **SDL2** for graphics, keyboard inpu
 
 This project was built to strengthen my understanding of low-level programming concepts including memory management, bitwise operations, instruction decoding, CPU-style fetch/decode/execute cycles, timers, stack-based subroutines, and hardware-style input/output.
 
+[View Project Demo](https://app.notion.com/p/CHIP-8-Emulator-3c24a3278117802b81eeda8c3a0802f1)
+
 ## Features
 
 * CHIP-8 CPU emulation
@@ -122,6 +124,9 @@ Sprites are stored as bytes in memory, with each byte representing one row of ei
 The `DXYN` instruction draws the sprite using XOR logic. This also allows the emulator to detect collisions and set `VF` accordingly.
 
 The framebuffer is then rendered through SDL2 and scaled to a larger window (640x320) for visibility.
+
+![Emulator Gameplay](images-videos/Superpong.gif)
+![IBM_Logo](images-videos/ibm_logo.png)
 
 ## Keyboard
 
