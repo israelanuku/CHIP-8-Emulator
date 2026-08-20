@@ -67,7 +67,7 @@ void generate_beep(float* buffer, int samples, int sample_rate)
 int main()
 {
     Chip8 chip8;
-    chip8.load_rom("roms/superpong.ch8");
+    chip8.load_rom("roms/sound_test.ch8");
 
     // initialize both the video and audio systems
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO) != 0) {
