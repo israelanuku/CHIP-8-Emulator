@@ -115,13 +115,13 @@ This allows subroutines to return to the instruction following the original call
 
 ## Graphics
 
-The CHIP-8 display is a 64 × 32 monochrome framebuffer.
+The CHIP-8 display is 64 × 32.
 
 Sprites are stored as bytes in memory, with each byte representing one row of eight pixels.
 
 The `DXYN` instruction draws the sprite using XOR logic. This also allows the emulator to detect collisions and set `VF` accordingly.
 
-The framebuffer is then rendered through SDL2 and scaled to a larger window for visibility.
+The framebuffer is then rendered through SDL2 and scaled to a larger window (640x320) for visibility.
 
 ## Keyboard
 
