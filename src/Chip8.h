@@ -13,7 +13,7 @@ private:
     std::uint16_t I{0};
 
     std::array<std::uint16_t, 16> stack{};
-    std::uint8_t sp{0};
+    std::uint8_t sp{0}; // stack pointer
 
     std::uint8_t delay_timer{0};
     std::uint8_t sound_timer{0};
@@ -39,4 +39,5 @@ public:
     void tick_timers();
     std::uint8_t get_delay_timer() const;
     std::uint8_t get_sound_timer() const;
+    void set_memory(std::uint16_t address, std::uint8_t value);
 };

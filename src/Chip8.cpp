@@ -30,7 +30,7 @@ void Chip8::execute_opcode(std::uint16_t opcode)
 
             else if (opcode == 0x00EE) {
                 --sp;
-                pc = stack[sp];
+                pc = stack[sp]; // continues where it left off
             }
             break;
 
@@ -41,9 +41,9 @@ void Chip8::execute_opcode(std::uint16_t opcode)
 
         case 0x2:
             // 2NNN
-            stack[sp] = pc;
+            stack[sp] = pc; // saving the return spot
             sp++;
-            pc = address;
+            pc = address; // pc jumps to subroutine
             break;
 
         case 0x3:
@@ -354,4 +354,8 @@ std::uint8_t Chip8::get_delay_timer() const
 std::uint8_t Chip8::get_sound_timer() const
 {
     return sound_timer;
+}
+
+void Chip8::set_memory(std::uint16_t address, std::uint8_t value) {
+    memory[address] = value;
 }
