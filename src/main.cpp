@@ -67,7 +67,7 @@ void generate_beep(float* buffer, int samples, int sample_rate)
 int main()
 {
     Chip8 chip8;
-    chip8.load_rom("roms/ibm-logo.ch8");
+    chip8.load_rom("roms/superpong.ch8");
 
     // initialize both the video and audio systems
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO) != 0) {
@@ -186,8 +186,7 @@ int main()
 
         // execute chip-8 instructions at the cpu frequency
         // FX0A pauses execution until a key is pressed
-        if (!chip8.is_waiting_for_key() &&
-            current_time - last_cpu_tick >= cpu_interval) {
+        if (!chip8.is_waiting_for_key() && current_time - last_cpu_tick >= cpu_interval) {
 
             last_cpu_tick = current_time;
             chip8.cycle();
@@ -195,9 +194,8 @@ int main()
 
         // only generate more audio if the chip-8 sound timer is active
         // and the audio queue does not already contain too much audio
-        if (chip8.get_sound_timer() > 0 &&
-            SDL_GetQueuedAudioSize(audio_device) < 2048) {
-
+        if (chip8.get_sound_timer() > 0 && SDL_GetQueuedAudioSize(audio_device) < 2048) {
+            std::cout << "SOUND TIMER: " << static_cast<int>(chip8.get_sound_timer()) << '\n';
             float audio_buffer[512];
 
             // fill the buffer with one chunk of the square-wave beep
