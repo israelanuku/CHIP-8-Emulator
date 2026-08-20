@@ -33,7 +33,6 @@ public:
     std::uint16_t get_pc();
     std::uint8_t get_register(std::uint8_t index);
     const std::array<std::uint8_t, 64*32>& get_display() const;
-    void test_display();
     void set_key(std::uint8_t key, bool pressed);
     bool is_waiting_for_key() const;
     void tick_timers();

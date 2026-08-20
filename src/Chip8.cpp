@@ -308,20 +308,6 @@ const std::array<std::uint8_t, 64*32>& Chip8::get_display() const {
     return display;
 }
 
-void Chip8::test_display() {
-    // 3x3 test display
-
-    display[0] = 1;
-    display[1] = 1;
-    display[2] = 1;
-    display[64] = 1;
-    display[65] = 1;
-    display[66] = 1;
-    display[128] = 1;
-    display[129] = 1;
-    display[130] = 1;
-}
-
 void Chip8::set_key(std::uint8_t key, bool pressed) {
     keypad[key] = pressed;
 
